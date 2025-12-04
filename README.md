@@ -5,6 +5,18 @@
 Visual Studio Solution Generator for Unity to improve developer productivity when working with multi-package unity projects.
 This package intercepts the Visual Studio Solution generation done by Unity's [Visual Studio C# integration](https://docs.unity3d.com/Manual/VisualStudioIntegration.html). It preforms the following changes to the solution / project files:
 
+## Installation
+
+To install, paste the following URL into Unity's **Package Manager**:
+
+1. Open **Package Manager**.
+2. Click the **+** button.
+3. Select **"Add package from git URL..."**.
+4. Enter the following URL:
+```bash
+https://github.com/hoangtongvu/UnityVisualStudioSolutionGenerator.git?path=/src/UnityVisualStudioSolutionGenerator/Assets
+```
+
 ## Reduced project hierarchy
 
 Placing projects next to code so the file hierarchy inside Visual Studio Solution Explorer is cleaner.

@@ -184,6 +184,14 @@ namespace UnityVisualStudioSolutionGenerator
                     continue;
                 }
 
+                if (generator.IsProjectFromAsmrefFile())
+                {
+                    LogHelper.LogVerbose(
+                        $"The project '{Path.GetFileNameWithoutExtension(projectFilePath)}' is an Assembly Reference file so we don't change the '.csproj' file.");
+                    newProjects.Add(project);
+                    continue;
+                }
+
                 if (!File.Exists(generator.AssemblyDefinitionFilePath))
                 {
                     LogHelper.LogInformation(

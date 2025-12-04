@@ -94,6 +94,31 @@ namespace UnityVisualStudioSolutionGenerator
         }
 
         /// <summary>
+        ///     Determines whether the project is from the .asmref file.
+        /// </summary>
+        /// <returns>True if the project file is from a package, False otherwise.</returns>
+        public bool IsProjectFromAsmrefFile()
+        {
+            if (assemblyDefinitionFilePath is not null)
+            {
+                return IsProjectFromAsmrefFile(assemblyDefinitionFilePath);
+            }
+
+            var anyProjectFilePath = ProjectElement.Descendants(XmlNamespace + "None")
+                .Concat(ProjectElement.Descendants(XmlNamespace + "Compile"))
+                .Select(element => element.Attribute("Include")?.Value)
+                .FirstOrDefault(itemPath => itemPath is not null);
+
+            if (anyProjectFilePath is not null)
+            {
+                return IsProjectFromAsmrefFile(Path.GetFullPath(anyProjectFilePath, DirectoryPath));
+            }
+
+            LogHelper.LogWarning($"The project file: {FilePath} has no content so skipping it.");
+            return true;
+        }
+
+        /// <summary>
         ///     Read the Project file and extract all source code files. But exclude files that are inside a 'PackageCache'.
         /// </summary>
         /// <returns>The absolute file path of all source code files, referenced by this project file.</returns>
@@ -142,6 +167,22 @@ namespace UnityVisualStudioSolutionGenerator
                 StringComparison.OrdinalIgnoreCase);
         }
 
+        /// <summary>
+        ///     Determines whether the project is from the .asmref file.
+        /// </summary>
+        /// <param name="projectFilePath">The absolute path to one project file (can also be a file that lies inside the project folder).</param>
+        /// <returns>True if the project file is from a package that is located inside the 'PackageCache', False otherwise.</returns>
+        internal static bool IsProjectFromAsmrefFile(string projectFilePath)
+        {
+            _ = projectFilePath ?? throw new ArgumentNullException(nameof(projectFilePath));
+
+            return Directory.EnumerateFiles(
+                Path.GetDirectoryName(projectFilePath),
+                "*.asmref",
+                SearchOption.TopDirectoryOnly
+            ).Any();
+        }
+
         private string ExtractAssemblyDefinitionFilePath()
         {
             var assemblyDefinitionFilePaths = ProjectElement.Descendants(XmlNamespace + "None")
@@ -161,7 +202,6 @@ namespace UnityVisualStudioSolutionGenerator
                     {
                         throw new InvalidOperationException(
                             $"The csproj file '{FilePath}' need to have exactly one '.asmref' file but it has ['{string.Join("', '", assemblyDefinitionFilePaths)}']");
-
                     }
                 }
                 else

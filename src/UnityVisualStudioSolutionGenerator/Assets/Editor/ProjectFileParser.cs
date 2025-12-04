@@ -150,8 +150,25 @@ namespace UnityVisualStudioSolutionGenerator
                 .ToList();
             if (assemblyDefinitionFilePaths.Count != 1)
             {
-                throw new InvalidOperationException(
-                    $"The csproj file '{FilePath}' need to have exactly one '.asmdef' file but it has ['{string.Join("', '", assemblyDefinitionFilePaths)}']");
+                if (assemblyDefinitionFilePaths.Count == 0)
+                {
+                    assemblyDefinitionFilePaths = ProjectElement.Descendants(XmlNamespace + "None")
+                        .Select(noneElement => noneElement.Attribute("Include")?.Value)
+                        .Where(noneItemPath => noneItemPath?.EndsWith(".asmref", StringComparison.OrdinalIgnoreCase) == true)
+                        .ToList();
+
+                    if (assemblyDefinitionFilePaths.Count != 1)
+                    {
+                        throw new InvalidOperationException(
+                            $"The csproj file '{FilePath}' need to have exactly one '.asmref' file but it has ['{string.Join("', '", assemblyDefinitionFilePaths)}']");
+
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException(
+                        $"The csproj file '{FilePath}' need to have exactly one '.asmdef' file but it has ['{string.Join("', '", assemblyDefinitionFilePaths)}']");
+                }
             }
 
             return Path.GetFullPath(assemblyDefinitionFilePaths[0], DirectoryPath);

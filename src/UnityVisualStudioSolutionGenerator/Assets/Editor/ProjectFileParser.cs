@@ -79,18 +79,25 @@ namespace UnityVisualStudioSolutionGenerator
                 return IsProjectFileFromPackageCache(assemblyDefinitionFilePath);
             }
 
-            var anyProjectFilePath = ProjectElement.Descendants(XmlNamespace + "Compile")
+            var projectFilePaths = ProjectElement.Descendants(XmlNamespace + "Compile")
                 .Concat(ProjectElement.Descendants(XmlNamespace + "None"))
-                .Select(element => element.Attribute("Include")?.Value)
-                .FirstOrDefault(itemPath => itemPath is not null);
+                .Select(element => element.Attribute("Include")?.Value);
 
-            if (anyProjectFilePath is not null)
+            foreach (var projectFilePath in projectFilePaths)
             {
-                return IsProjectFileFromPackageCache(Path.GetFullPath(anyProjectFilePath, DirectoryPath));
+                if (projectFilePath is null)
+                {
+                    LogHelper.LogWarning($"The project file: {FilePath} has no content so skipping it.");
+                    continue;
+                }
+
+                if (!IsProjectFileFromPackageCache(Path.GetFullPath(projectFilePath, DirectoryPath)))
+                    continue;
+
+                return true;
             }
 
-            LogHelper.LogWarning($"The project file: {FilePath} has no content so skipping it.");
-            return true;
+            return false;
         }
 
         /// <summary>

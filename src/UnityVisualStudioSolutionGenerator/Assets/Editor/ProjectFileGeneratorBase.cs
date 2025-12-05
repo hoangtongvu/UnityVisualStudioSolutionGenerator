@@ -111,16 +111,7 @@ namespace UnityVisualStudioSolutionGenerator
                     assemblyDefinitionFilePath => Path.GetRelativePath(outputFileDirectoryPath, Path.GetDirectoryName(assemblyDefinitionFilePath)))
                 .Where(relativeSubProjectDirectory => !string.IsNullOrEmpty(relativeSubProjectDirectory) && relativeSubProjectDirectory != ".");
 
-            var asmrefFolders = Directory
-                .EnumerateFiles(
-                    outputFileDirectoryPath,
-                    "*.asmref",
-                    new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = true })
-                .Select(
-                    asmrefFilePath => Path.GetRelativePath(outputFileDirectoryPath, Path.GetDirectoryName(asmrefFilePath)))
-                .Where(relativeSubProjectDirectory => !string.IsNullOrEmpty(relativeSubProjectDirectory) && relativeSubProjectDirectory != ".");
-
-            return foldersToIgnore.Concat(asmrefFolders);
+            return foldersToIgnore;
         }
 
         /// <summary>

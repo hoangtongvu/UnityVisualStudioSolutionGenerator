@@ -165,6 +165,8 @@ namespace UnityVisualStudioSolutionGenerator
         private static List<ProjectFile> GenerateNewProjects(IReadOnlyList<ProjectFile> allProjects, SolutionFile solutionFile)
         {
             var newProjects = new List<ProjectFile>();
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
             foreach (var project in allProjects)
             {
                 var projectFilePath = project.FilePath;
@@ -199,6 +201,12 @@ namespace UnityVisualStudioSolutionGenerator
                 }
 
                 var newProjectFilePath = generator.WriteProjectFile(solutionFile.SolutionDirectoryPath);
+
+                // ↓ THE FIX: key by the canonical output path
+                if (!seen.Add(newProjectFilePath.ToUpperInvariant()))
+                {
+                    continue; // already processed this logical project
+                }
 
                 ReSharperProjectSettingsGenerator.WriteSettingsIfMissing(newProjectFilePath);
                 ProjectSourceCodeWatcherManager.AddSourceCodeWatcherForProject(GetDirectoryPath(newProjectFilePath));

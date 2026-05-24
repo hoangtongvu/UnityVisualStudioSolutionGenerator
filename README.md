@@ -5,6 +5,12 @@
 Visual Studio Solution Generator for Unity to improve developer productivity when working with multi-package unity projects.
 This package intercepts the Visual Studio Solution generation done by Unity's [Visual Studio C# integration](https://docs.unity3d.com/Manual/VisualStudioIntegration.html). It preforms the following changes to the solution / project files:
 
+## What's changed in this fork
+
+- Support `.asmref`
+- The solution generation time is slightly slower
+- Fix broken `.slnx` generation on some projects due to the duplicate `.csproj` references
+
 ## Installation
 
 To install, paste the following URL into Unity's **Package Manager**:

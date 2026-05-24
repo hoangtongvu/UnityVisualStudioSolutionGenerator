@@ -92,7 +92,7 @@ namespace UnityVisualStudioSolutionGenerator
             wrappedWriter.WriteAttributeString("Sdk", "Microsoft.NET.Sdk");
             wrappedWriter.WriteEndElement(); // </Import>
 
-            // include *.asmdef file explicitly so we can find it later
+            // include *.asmdef or *.asmref file explicitly so we can find it later  
             wrappedWriter.WriteStartElement("ItemGroup");
             wrappedWriter.WriteStartElement("None");
             wrappedWriter.WriteAttributeString("Include", Path.GetRelativePath(outputFileDirectoryPath, AssemblyDefinitionFilePath));

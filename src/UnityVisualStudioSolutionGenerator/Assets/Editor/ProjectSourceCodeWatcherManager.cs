@@ -64,6 +64,16 @@ namespace UnityVisualStudioSolutionGenerator
 
                     projectRootDirectoryPath = ProjectFileParser.GetProjectRootDirectoryPath(project.FilePath);
                 }
+                else if (File.Exists(Path.ChangeExtension(project.FilePath, ".asmref")))
+                {
+                    // fast path without needing to read the content of the .csproj because the .asmref file is directly next to the .csproj file.
+                    if (ProjectFileParser.IsProjectFileFromPackageCache(project.FilePath))
+                    {
+                        continue;
+                    }
+
+                    projectRootDirectoryPath = ProjectFileParser.GetProjectRootDirectoryPath(project.FilePath);
+                }
                 else
                 {
                     var generator = ProjectFileGeneratorBase.Create(project.FilePath);

@@ -102,16 +102,22 @@ namespace UnityVisualStudioSolutionGenerator
         /// <returns>A list of all path's of directories containing sub-projects.</returns>
         protected static IEnumerable<string> FindSubProjectFolders(string outputFileDirectoryPath)
         {
-            var foldersToIgnore = Directory
-                .EnumerateFiles(
+            var options = new EnumerationOptions
+            {
+                MatchCasing = MatchCasing.CaseInsensitive,
+                RecurseSubdirectories = true
+            };
+
+            return Directory
+                .EnumerateFiles(outputFileDirectoryPath, "*.asmdef", options)
+                .Concat(Directory.EnumerateFiles(outputFileDirectoryPath, "*.asmref", options))
+                .Select(filePath => Path.GetRelativePath(
                     outputFileDirectoryPath,
-                    "*.asmdef",
-                    new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = true })
-                .Select(assemblyDefinitionFilePath => Path.GetRelativePath(
-                    outputFileDirectoryPath,
-                    Path.GetDirectoryName(assemblyDefinitionFilePath)))
-                .Where(relativeSubProjectDirectory => !string.IsNullOrEmpty(relativeSubProjectDirectory) && relativeSubProjectDirectory != ".");
-            return foldersToIgnore;
+                    Path.GetDirectoryName(filePath)!))
+                .Where(relativeDirectory =>
+                    !string.IsNullOrEmpty(relativeDirectory) &&
+                    relativeDirectory != ".")
+                .Distinct(StringComparer.OrdinalIgnoreCase);
         }
 
         /// <summary>
